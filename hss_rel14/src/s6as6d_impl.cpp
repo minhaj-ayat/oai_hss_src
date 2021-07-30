@@ -2045,7 +2045,7 @@ void AIRProcessor::phase1() {
   }
 }
 
-int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t opc[16], uint8_t plmn[3])
+int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t opc[16], uint8_t plmn[3], uint8_t ck[16], uint8_t ik[16], uint8_t ak[6],auc_vector_t* v)
 {
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
@@ -2059,7 +2059,7 @@ int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t
     char hello[1024] = {0};
     int i=0;
 
-    for(i=0; i<16; i++)
+    /*for(i=0; i<16; i++)
     {
       hello[i] = key[i];
     }
@@ -2068,12 +2068,12 @@ int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t
     {
       hello[i] = sqn[i];
     }
-    hello[i] = ' ';
-    for(i=24; i<30; i++)
+    hello[i] = ' ';*/
+    for(i=0; i<16; i++)
     {
       hello[i] = rand[i];
     }
-    hello[i] = ' ';
+    /*hello[i] = ' ';
     for(i=31; i<47; i++)
     {
       hello[i] = opc[i];
@@ -2082,7 +2082,7 @@ int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t
     for(i=48; i<51; i++)
     {
       hello[i] = plmn[i];
-    }
+    }*/
 
     std::cout<<"connect_to_python payload message:: "<<std::endl;
     printf("%s\n",hello );
@@ -2113,6 +2113,99 @@ int connect_to_python(uint8_t key[16], uint8_t sqn[6], uint8_t rand[16], uint8_t
     printf("Payload message sent\n");
     valread = read( sock , buffer, 1024);
     printf("%s\n",buffer );
+
+    char *p;
+    p = strtok(buffer, " ");
+    char *autnk = p;
+    p = strtok(NULL, " ");
+    char *xresk = p;
+    p = strtok(NULL, " ");
+    char *ckk = p;
+    p = strtok(NULL, " ");
+    char *ikk = p;
+    p = strtok(NULL, " ");
+    char *akk = p;
+
+    printf("AUTNK :  %s\n", autnk);
+    printf("XRESK :  %s\n", xresk);
+    printf("CKK :  %s\n", ckk);
+    printf("IKK :  %s\n", ikk);
+    printf("AKK :  %s\n", akk);
+
+    char *q = strtok(autnk,",");
+    int a=0;
+    while(q != NULL)
+        {
+          v->autn[a] = (uint8_t) atoi(q);
+          q = strtok(NULL, ",");
+          a++;
+        }
+    printf("AUTN :  %s\n", v->autn);
+    for (int b = 0; b < 16; b++) {
+    printf("%02x.", v->autn[b]);
+    }
+    printf("\n");
+
+    
+    char *s = strtok(xresk,",");
+    a=0;
+    while(s != NULL)
+        {
+          v->xres[a] = (uint8_t) atoi(s);
+          s = strtok(NULL, ",");
+          a++;
+        }
+    printf("XRES :  %s\n", v->xres);
+    for (int b = 0; b < 8; b++) {
+    printf("%02x.", v->xres[b]);
+    }
+    printf("\n");
+
+
+    char *u = strtok(ckk,",");
+    a=0;
+    while(u != NULL)
+        {
+          ck[a] = (uint8_t) atoi(u);
+          u = strtok(NULL, ",");
+          a++;
+        }
+    printf("CK :  %s\n", ck);
+    for (int b = 0; b < 16; b++) {
+    printf("%02x.", ck[b]);
+    }
+    printf("\n");
+
+
+    char *w = strtok(ikk,",");
+    a=0;
+    while(w != NULL)
+        {
+          ik[a] = (uint8_t) atoi(w);
+          w = strtok(NULL, ",");
+          a++;
+        }
+    printf("IK :  %s\n", ik);
+    for (int b = 0; b < 16; b++) {
+    printf("%02x.", ik[b]);
+    }
+    printf("\n");
+
+    
+    char *y = strtok(akk,",");
+    a=0;
+    while(y != NULL)
+        {
+          ak[a] = (uint8_t) atoi(y);
+          y = strtok(NULL, ",");
+          a++;
+        }
+    printf("AK :  %s\n", ak);
+    for (int b = 0; b < 6; b++) {
+    printf("%02x.", ak[b]);
+    }
+    printf("\n");
+
 }
 
 void AIRProcessor::phase2() {
@@ -2159,16 +2252,19 @@ void AIRProcessor::phase2() {
     generate_random_cpp(m_vector[i].rand, RAND_LENGTH);
 
     std::cout<<"(In s6as6d_impl phase2)"<<std::endl;
-    std::cout<<"key_str : "<<m_sec.key<<std::endl;
-    std::cout<<"sqn : "<<m_sec.sqn<<std::endl;
-    std::cout<<"rand_str : "<<m_vector->rand<<std::endl;
-    std::cout<<"opc_str : "<<m_sec.opc<<std::endl;
-    std::cout<<"plmn : "<<m_plmn_id<<std::endl;
-    std::cout<<"(Calling generate_vector_cpp s6as6d_impl phase2)"<<std::endl;
+    //std::cout<<"key_str : "<<m_sec.key<<std::endl;
+    //std::cout<<"sqn : "<<m_sec.sqn<<std::endl;
+    //std::cout<<"rand_str : "<<m_vector->rand<<std::endl;
+    //std::cout<<"opc_str : "<<m_sec.opc<<std::endl;
+    //std::cout<<"plmn : "<<m_plmn_id<<std::endl;
+    //std::cout<<"(Calling generate_vector_cpp s6as6d_impl phase2)"<<std::endl;
 
-    connect_to_python(m_sec.key, m_sec.sqn, m_vector->rand,m_sec.opc, m_plmn_id);
-    generate_vector_cpp(
-        m_sec.opc, m_uimsi, m_sec.key, m_plmn_id, m_sec.sqn, &m_vector[i]);
+    uint8_t ck[16]; 
+    uint8_t ik[16];
+    uint8_t ak[6];
+
+    connect_to_python(m_sec.key, m_sec.sqn, m_vector->rand,m_sec.opc, m_plmn_id, ck, ik, ak, &m_vector[i]);
+    generate_vector_cpp(m_sec.opc, m_uimsi, m_sec.key, m_plmn_id, m_sec.sqn, ck, ik, ak, &m_vector[i]);
   }
 
   memcpy(m_sec.rand, m_vector[0].rand, sizeof(m_sec.rand));

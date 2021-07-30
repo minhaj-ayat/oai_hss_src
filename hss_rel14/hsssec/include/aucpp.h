@@ -37,7 +37,7 @@ void generate_random_cpp(uint8_t* random, ssize_t length);
 
 int generate_vector_cpp(
     const uint8_t opc[16], uint64_t imsi, uint8_t key[16], uint8_t plmn[3],
-    uint8_t sqn[6], auc_vector_t* vector);
+    uint8_t sqn[6], uint8_t ck[16], uint8_t ik[16], uint8_t ak[6], auc_vector_t* vector);
 
 void random_init(void);
 

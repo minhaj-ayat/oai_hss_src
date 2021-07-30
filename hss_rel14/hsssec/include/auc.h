@@ -75,7 +75,7 @@ void generate_autn(
     uint8_t const mac_a[8], uint8_t autn[16]);
 int generate_vector(
     uint8_t const opc[16], uint64_t imsi, uint8_t key[16], uint8_t plmn[3],
-    uint8_t sqn[6], auc_vector_t* vector);
+    uint8_t sqn[6], uint8_t ck[16], uint8_t ik[16], uint8_t ak[6], auc_vector_t* vector);
 
 void kdf(
     uint8_t* key, uint16_t key_len, uint8_t* s, uint16_t s_len, uint8_t* out,

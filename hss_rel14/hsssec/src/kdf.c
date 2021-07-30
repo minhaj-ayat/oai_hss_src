@@ -190,7 +190,7 @@ inline void derive_kasme(
 
 int generate_vector(
     const uint8_t opc[16], uint64_t imsi, uint8_t key[16], uint8_t plmn[3],
-    uint8_t sqn[6], auc_vector_t* vector) {
+    uint8_t sqn[6], uint8_t ck[16], uint8_t ik[16], uint8_t ak[6], auc_vector_t* vector) {
   /*
    * in E-UTRAN an authentication vector is composed of:
    * * * * - RAND
@@ -198,16 +198,16 @@ int generate_vector(
    * * * * - AUTN
    * * * * - KASME
    */
-  uint8_t amf[] = {0x80, 0x00};
-  uint8_t mac_a[8];
-  uint8_t ck[16];
-  uint8_t ik[16];
-  uint8_t ak[6];
+
+   /*uint8_t amf[] = {0x80, 0x00};
+   uint8_t mac_a[8];
+   uint8_t ck[16];
+   uint8_t ik[16];
+   uint8_t ak[6];*/
 
   if (vector == NULL) {
     return EINVAL;
   }
-
   print_buffer("Received key : ", key, 16);
   print_buffer("Received sqn : ", sqn, 6);
   print_buffer("Received opc : ", opc, 16);
@@ -216,22 +216,22 @@ int generate_vector(
   /*
    * Compute MAC
    */
-  f1(opc, key, vector->rand, sqn, amf, mac_a);
+  /*f1(opc, key, vector->rand, sqn, amf, mac_a);
   print_buffer("MAC_A   : ", mac_a, 8);
   print_buffer("SQN     : ", sqn, 6);
-  print_buffer("RAND    : ", vector->rand, 16);
+  print_buffer("RAND    : ", vector->rand, 16);*/
   /*
    * Compute XRES, CK, IK, AK
    */
-  f2345(opc, key, vector->rand, vector->xres, ck, ik, ak);
+  //f2345(opc, key, vector->rand, vector->xres, nck, nik, nak);
   print_buffer("AK      : ", ak, 6);
   print_buffer("CK      : ", ck, 16);
   print_buffer("IK      : ", ik, 16);
-  print_buffer("XRES    : ", vector->xres, 8);
+  //print_buffer("XRES    : ", vector->xres, 8);
   /*
    * AUTN = SQN ^ AK || AMF || MAC
    */
-  generate_autn(sqn, ak, amf, mac_a, vector->autn);
+  //generate_autn(sqn, nak, amf, mac_a, vector->autn);
   print_buffer("AUTN    : ", vector->autn, 16);
   derive_kasme(ck, ik, plmn, sqn, ak, vector->kasme);
   print_buffer("KASME   : ", vector->kasme, 32);
